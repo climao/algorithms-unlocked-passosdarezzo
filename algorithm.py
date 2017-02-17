@@ -4,18 +4,62 @@ import time
 import sys
 from random import randint
 
-class Caixa:
-    def __init__(self):
-        self.linhas = []
+class Box:
+    '''
+    Creates a box
 
-    def adiciona_linha(self, linha):
-        self.linhas.append(linha)
+    my_box = Box()
+    my_box.add_line('Prefiro morrer do que perder a vida')
+    my_box.print_box()
+    '''
 
-    def imprime_caixa(self):
-        print '\n' + u'\u250f' + 30 * u'\u2501' + u'\u2513'
-        for i in self.linhas:
-            print u'\u2503' + i + (48 - len(i)) * ' ' + u'\u2503'
-        print u'\u2517' + 30 * u'\u2501' + u'\u251b'
+    heavy_box_chars = {'top_left_corner' : u'\u250f',
+                       'top_right_corner' : u'\u2513',
+                       'bottom_left_corner' : u'\u2517',
+                       'bottom_right_corner' : u'\u251b',
+                       'horizontal_line' : u'\u2501',
+                       'vertical_line' : u'\u2503',
+                       'space' : ' '}
+        
+    light_box_chars = {'top_left_corner' : u'\u250c',
+                       'top_right_corner' : u'\u2510',
+                       'bottom_left_corner' : u'\u2514',
+                       'bottom_right_corner' : u'\u2502',
+                       'horizontal_line' : u'\u2500',
+                       'vertical_line' : u'\u2502',
+                       'space' : ' '}
+
+    simple_box_chars = {'top_left_corner' : u'\u2552',
+                        'top_right_corner' : u'\u2555',
+                        'bottom_left_corner' : u'\u2558',
+                        'bottom_right_corner' : u'\u255b',
+                        'horizontal_line' : u'\u2550',
+                        'vertical_line' : u'\u2502',
+                        'space' : ' '}          
+    
+    def __init__(self, max_width=40):
+        self.lines = []
+        self.max_width = max_width
+        self.bigger_line = 0
+   
+        
+    def add_line(self, line):
+        if self.bigger_line < len(line):
+            self.bigger_line = len(line)
+            
+        self.lines.append(line)
+
+    def print_box(self):
+        max_line = self.max_width - 2
+        off_set = 0
+        ne = self.simple_box_chars
+        
+        print ne['top_left_corner'] + max_line * ne['horizontal_line'] + ne['top_right_corner']
+
+        for i in self.lines:
+            print ne['vertical_line'] + i + (max_line - len(i)) * ne['space'] + ne['vertical_line']
+            
+        print ne['bottom_left_corner'] + max_line * ne['horizontal_line']  + ne['bottom_right_corner'] 
 
 def benchmark(funcao, *arranjo, **procurado):
     '''
@@ -24,11 +68,11 @@ def benchmark(funcao, *arranjo, **procurado):
     indice = funcao(*arranjo, **procurado)
     stop = time.clock()
 
-    caixa = Caixa()
-    caixa.adiciona_linha(funcao.__name__)
-    caixa.adiciona_linha('Retorno: ' + str(indice))
-    caixa.adiciona_linha('Tempo de execucao: ' + str(stop-start))
-    caixa.imprime_caixa()
+    caixa = Box()
+    caixa.add_line(funcao.__name__)
+    caixa.add_line('Retorno: ' + str(indice))
+    caixa.add_line('Tempo de execucao: ' + str(stop-start))
+    caixa.print_box()
 
 def benchmark_sort(funcao, *arranjo):
     '''
@@ -37,10 +81,10 @@ def benchmark_sort(funcao, *arranjo):
     indice = funcao(*arranjo)
     stop = time.clock()
 
-    caixa = Caixa()
-    caixa.adiciona_linha(funcao.__name__)
-    caixa.adiciona_linha('Tempo de execucao: '+ str(stop-start))
-    caixa.imprime_caixa()
+    caixa = Box()
+    caixa.add_line(funcao.__name__)
+    caixa.add_line('Tempo de execucao: '+ str(stop-start))
+    caixa.print_box()
 
     return indice
 
@@ -237,10 +281,42 @@ def partition(arranjo, p, r):
     arranjo[q], arranjo[r] = arranjo[r], arranjo[q]
 
     return q
+
+def count_keys_equal(arranjo, n, m):
+    '''
+    arranjo => Lista
+    n => numero de elementos
+    m =>
+    
+    lista = [1,1,0,1,1,0,0,0,1]
+    count_keys_equal(lista, len(lista)-1, 2)
+    '''
+    equal = (m + 1) * [0] # because of the zero
+
+    for i in range(n):
+        key = arranjo[i]
+        equal[key] += 1
+
+    print 'equal: ' + str(equal)
+    return equal
+
+def count_keys_less(equal, m):
+    '''
+    '''
+    less = [0] * m
+
+    for j in range(m):
+        less[j] = less[j - 1] + equal[j - 1]
+
+    print 'less: ' + str(less)
+    return less
+
+lista = [0,0,0,0,1,0,1,1,2,3,6,3,2,2,2]
+equal = count_keys_equal(lista, len(lista), 6)
+
+
 #**************************************************
 
-a = generate_random_list(10000, 1, 10000000)
-print('tamanho do arranjo: ' + str(len(a)))
 
 '''
 benchmark(linear_search, a, a[40])
@@ -256,5 +332,11 @@ benchmark_sort(selection_sort, a)
 benchmark_sort(insertion_sort, a)
 '''
 
+a = generate_random_list(100, 1, 100000)
+print('tamanho do arranjo: ' + str(len(a)))
+benchmark_sort(merge_sort, a, 0, len(a) - 1)
+
+a = generate_random_list(100, 1, 100000)
+print('tamanho do arranjo: ' + str(len(a)))
 benchmark_sort(quicksort, a, 0, len(a) - 1)
 #print(n)
