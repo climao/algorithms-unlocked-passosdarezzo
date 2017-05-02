@@ -20,7 +20,7 @@ class Box:
                        'horizontal_line' : u'\u2501',
                        'vertical_line' : u'\u2503',
                        'space' : ' '}
-        
+
     light_box_chars = {'top_left_corner' : u'\u250c',
                        'top_right_corner' : u'\u2510',
                        'bottom_left_corner' : u'\u2514',
@@ -35,31 +35,31 @@ class Box:
                         'bottom_right_corner' : u'\u255b',
                         'horizontal_line' : u'\u2550',
                         'vertical_line' : u'\u2502',
-                        'space' : ' '}          
-    
+                        'space' : ' '}
+
     def __init__(self, max_width=40):
         self.lines = []
         self.max_width = max_width
         self.bigger_line = 0
-   
-        
+
+
     def add_line(self, line):
         if self.bigger_line < len(line):
             self.bigger_line = len(line)
-            
+
         self.lines.append(line)
 
     def print_box(self):
         max_line = self.max_width - 2
         off_set = 0
         ne = self.simple_box_chars
-        
+
         print ne['top_left_corner'] + max_line * ne['horizontal_line'] + ne['top_right_corner']
 
         for i in self.lines:
             print ne['vertical_line'] + i + (max_line - len(i)) * ne['space'] + ne['vertical_line']
-            
-        print ne['bottom_left_corner'] + max_line * ne['horizontal_line']  + ne['bottom_right_corner'] 
+
+        print ne['bottom_left_corner'] + max_line * ne['horizontal_line']  + ne['bottom_right_corner']
 
 def benchmark(funcao, *arranjo, **procurado):
     '''
@@ -287,7 +287,7 @@ def count_keys_equal(arranjo, n, m):
     arranjo => Lista
     n => numero de elementos
     m =>
-    
+
     lista = [1,1,0,1,1,0,0,0,1]
     count_keys_equal(lista, len(lista)-1, 2)
     '''
@@ -306,7 +306,10 @@ def count_keys_less(equal, m):
     less = [0] * m
 
     for j in range(m):
-        less[j] = less[j - 1] + equal[j - 1]
+        if j > 0:
+            less[j] = less[j - 1] + equal[j - 1]
+        else:
+            less[j] = less[j] + equal[j]
 
     print 'less: ' + str(less)
     return less
@@ -314,9 +317,7 @@ def count_keys_less(equal, m):
 lista = [0,0,0,0,1,0,1,1,2,3,6,3,2,2,2]
 equal = count_keys_equal(lista, len(lista), 6)
 
-
 #**************************************************
-
 
 '''
 benchmark(linear_search, a, a[40])
